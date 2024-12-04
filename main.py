@@ -105,8 +105,8 @@ def main():
     
     # Parâmetro de distância
     max_distance = st.sidebar.slider(
-        'Distância máxima para considerar ponto verificado (metros)', 
-        min_value=1, max_value=10, value=2
+        'Tolerância para erros', 
+        min_value=1, max_value=10, value=4
     )
     
     # Botão de comparação
