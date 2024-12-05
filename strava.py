@@ -24,11 +24,12 @@ def generate_map(url):
                 latlng = json_data.get('streams', {}).get('latlng', None)
 
                 if latlng:
-                    m = folium.Map(location=latlng[0], zoom_start=13)
-                    for coord in latlng:
-                        folium.Marker([coord[0], coord[1]]).add_to(m)
+                    map_object = folium.Map(location=latlng[0], zoom_start=13)
+                    folium.PolyLine(latlng, color="blue", weight=2.5, opacity=1).add_to(map_object)
+                    #for coord in latlng:
+                        #folium.Marker([coord[0], coord[1]]).add_to(m)
 
-                    m.save('map.html')
+                    map_object.save('map_strava.html')
 
 
 if __name__ == "__main__":
