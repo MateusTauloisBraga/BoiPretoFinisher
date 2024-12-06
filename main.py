@@ -55,7 +55,7 @@ def get_position_garmin(url):
         coordinates = track_point["position"]["lat"], track_point["position"]["lon"]
     return coordinates
 
-def get_position(url):
+def get_position_wikiloc(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
     }
@@ -68,10 +68,10 @@ def get_position(url):
             data = match.group(1)
             positions = data.split(",")
             
-            last_latitude = positions[-4]
-            last_longitude = positions[-3]
+            last_latitude = positions[-2]
+            last_longitude = positions[-1]
             
-            return float(last_longitude),float(last_latitude)
+            return float(last_longitude), float(last_latitude)
         else:
             st.warning("Dados de posição não encontrados.")
             return None
@@ -153,7 +153,7 @@ def live_tracking_page():
                     pass 
             if 'wikiloc' in url: 
                 try: 
-                    location = get_position(url) 
+                    location = get_position_wikiloc(url) 
                 except: 
                     pass 
             if 'garmin' in url: 
