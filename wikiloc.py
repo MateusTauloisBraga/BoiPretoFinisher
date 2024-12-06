@@ -27,12 +27,10 @@ if response.status_code == 200:
         data = match.group(1)
         positions = data.split(",")
         
-        last_latitude = positions[-2]
-        last_longitude = positions[-1]
+        last_latitude = positions[-1]
+        last_longitude = positions[-2]
 
-        first_coordinate = (positions[0], positions[1])
-        print(first_coordinate)
-        
+        first_coordinate = (positions[1], positions[0])
 
         map_object = folium.Map(location=first_coordinate, zoom_start=17)
 
@@ -42,6 +40,8 @@ if response.status_code == 200:
                         ).add_to(map_object)                    
 
         coordinates = [(float(positions[i]), float(positions[i + 1])) for i in range(0, len(positions), 4)]
+        print(coordinates)
+        coordinates = [(lat, lon) for lon, lat in coordinates]
         print(coordinates)
         folium.PolyLine(coordinates, color="blue", weight=2.5, opacity=1).add_to(map_object)
 
