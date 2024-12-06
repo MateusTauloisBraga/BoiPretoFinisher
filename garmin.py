@@ -29,10 +29,9 @@ if response.status_code == 200:
 
 
     total_distance_meters = track_points[-1]["fitnessPointData"]["totalDistanceMeters"]
-    print(total_distance_meters)
     total_distance = total_distance_meters / 1000
 
-    distance_text = f"Distância total: {total_distance_meters:.2f} km"
+    distance_text = f"Distância total: {total_distance:.2f} km"
 
     html = f"""
         <div style="position: fixed; 
