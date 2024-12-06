@@ -9,8 +9,20 @@ parsed_url = urlparse(original_url)
 
 path_parts = parsed_url.path.split('/')
 session_id = path_parts[2]
+session_token = path_parts[4]
 
 base_url = f"https://livetrack.garmin.com/services/session/{session_id}/trackpoints"
+
+
+userDisplayName = ""
+data_url = f"https://livetrack.garmin.com/services/session/{session_id}/sessionToken/{session_token}"
+
+data_response = requests.get(data_url)
+if data_response.status_code == 200:
+    data = data_response.json()
+    session = data.get("session", [])
+    userDisplayName = session["userDisplayName"]
+
 
 response = requests.get(base_url)
 
@@ -21,12 +33,20 @@ if response.status_code == 200:
 
     initial_coords = track_points[0]["position"].values()
     initial_coords = tuple(initial_coords)
+    print(initial_coords)
 
-    map_object = folium.Map(location=initial_coords, zoom_start=15)
+    map_object = folium.Map(location=initial_coords, zoom_start=17)
     
+    lat = track_points[-1]["position"]["lat"]
+    lon = track_points[-1]["position"]["lon"]
+    folium.Marker(
+        location=(lat, lon),
+        popup=f"Latitude: {lat}, Longitude: {lat}",
+        icon=folium.Icon(color="blue", icon="info-sign"),
+    ).add_to(map_object)
+
     coordinates = [(point["position"]["lat"], point["position"]["lon"]) for point in track_points]
     folium.PolyLine(coordinates, color="blue", weight=2.5, opacity=1).add_to(map_object)
-
 
     total_distance_meters = track_points[-1]["fitnessPointData"]["totalDistanceMeters"]
     total_distance = total_distance_meters / 1000
@@ -44,7 +64,15 @@ if response.status_code == 200:
                     color: black;
                     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); 
                     z-index: 9999;">
-            {distance_text}
+            <div style="font-size: 18px; font-weight: bold; color: black; margin-bottom: 5px;">
+                Garmin - LiveTrack
+            </div>
+            <div style="font-size: 18px; font-weight: bold; color: black; margin-bottom: 5px;">
+                {userDisplayName}
+            </div>
+            <div style="font-size: 16px; color: black;">
+                {distance_text}
+            </div>
         </div>
     """
 
