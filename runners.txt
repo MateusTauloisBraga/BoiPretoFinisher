@@ -1,4 +1,4 @@
 https://www.wikiloc.com/live/7436826/88EBULB?utm_medium=app&utm_campaign=live_tracking&utm_source=7436826 Mateus Wikiloc
 https://www.strava.com/beacon/3lAppyVROxB  Marcelove Strava
-https://livetrack.garmin.com/session/0a44556a-3c08-89f5-99b6-b9d57f5ba500/token/A13B7C18E49DF3C41C2504ED06614E2 Mateus Garmin
-https://livetrack.garmin.com/session/978888a3-d0be-8ca4-8529-06598c825d00/token/E49BA0EDF7E886DD8919BF0B6205965 Antônio Braga
+https://livetrack.garmin.com/session/0a44556a-3c08-89f5-99b6-b9d57f5ba500/token/A13B7C18E49DF3C41C2504ED06614E2 Mateus Braga 
+https://livetrack.garmin.com/session/ccebb2ad-5214-882b-9414-97f534484d00/token/11FDF95C2BBC9FA89792A396566D9BB Antônio Braga
