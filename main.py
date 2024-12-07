@@ -247,7 +247,31 @@ def test():
                     popup=f"Latitude: {last_latitude}, Longitude: {last_longitude}",
                     icon=folium.Icon(color="blue", icon="info-sign"),
                     ).add_to(map_object)
-    map_object
+
+    html = f"""
+        <div style="position: fixed; 
+                    top: 10px; right: 10px; 
+                    background-color: white; 
+                    padding: 8px 12px; 
+                    border-radius: 8px; 
+                    font-size: 16px; 
+                    font-weight: bold; 
+                    color: black;
+                    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); 
+                    z-index: 9999;">
+            <div style="font-size: 18px; font-weight: bold; color: black; margin-bottom: 5px;">
+                Strava - Beacon
+            </div>
+            <div style="font-size: 18px; font-weight: bold; color: black; margin-bottom: 5px;">
+                -
+            </div>
+            <div style="font-size: 16px; color: black;">
+                -
+            </div>
+        </div>
+    """
+
+    map_object.get_root().html.add_child(folium.Element(html))
 
 def main():
     # st.sidebar.image("logo.jpg", width=200)
