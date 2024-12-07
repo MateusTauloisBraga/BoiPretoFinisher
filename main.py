@@ -156,7 +156,7 @@ def live_tracking_page():
                     location = get_position_wikiloc(url) 
                 except: 
                     pass 
-            if 'garmin' in url: 
+            if 'gar' in url: 
                 try: 
                     location = get_position_garmin(url) 
                 except: 
