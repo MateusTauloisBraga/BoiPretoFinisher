@@ -10,6 +10,8 @@ from bs4 import BeautifulSoup
 import json
 from urllib.parse import urlparse
 import plotly.express as px
+import folium
+import folium.plugins
 
 st.set_page_config(
     page_title="Boi Preto",
@@ -50,6 +52,7 @@ def get_position_garmin(url):
         data = response.json()
         track_points = data.get("trackPoints", [])
         track_point = track_points[-1]
+
     return track_point["position"]["lat"], track_point["position"]["lon"]
 
 def get_position_wikiloc(url):
@@ -234,31 +237,17 @@ def compare_sequential_gpx(gpx1_file, gpx2_file, max_distance=2):
     return verified_percentage, points1, points2, verified_points
 
 def test():
-    # Dados das coordenadas
-    data = pd.DataFrame({
-        'latitude': [-19.949728, -19.949780, -19.949792],
-        'longitude': [-43.923436, -43.923447, -43.923398],
-        'info': ['Ponto 1', 'Ponto 2', 'Ponto 3']
-    })
+    positions = get_position_garmin("https://livetrack.garmin.com/session/ccebb2ad-5214-882b-9414-97f534484d00/token/11FDF95C2BBC9FA89792A396566D9BB")
+    last_latitude = positions[0]
+    last_longitude = positions[1]
+    
+    map_object = folium.Map(location=positions, zoom_start=17)
 
-    # Criando o mapa
-    fig = px.scatter_mapbox(
-        data,
-        lat='latitude',
-        lon='longitude',
-        hover_name='info',  # Texto do "pop-up" ao passar o mouse
-        zoom=15,
-        height=600
-    )
-
-    # Estilizando o mapa
-    fig.update_layout(
-        mapbox_style="open-street-map",
-        title="Mapa com Pop-ups no Plotly",
-        margin={"r":0,"t":0,"l":0,"b":0}
-    )
-
-    fig.show()
+    folium.Marker(location=(last_latitude, last_longitude),
+                    popup=f"Latitude: {last_latitude}, Longitude: {last_longitude}",
+                    icon=folium.Icon(color="blue", icon="info-sign"),
+                    ).add_to(map_object)
+    map_object
 
 def main():
     # st.sidebar.image("logo.jpg", width=200)
