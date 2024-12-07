@@ -272,6 +272,19 @@ def test():
     """
 
     map_object.get_root().html.add_child(folium.Element(html))
+    map_html = map_object._repr_html_()
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Meu Mapa</title>
+    </head>
+    <body>
+        <h1>Bem-vindo ao meu mapa!</h1>
+        <div>{map_html}</div>
+    </body>
+    </html>
+    """
 
 def main():
     # st.sidebar.image("logo.jpg", width=200)
