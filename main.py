@@ -9,6 +9,7 @@ import re
 from bs4 import BeautifulSoup
 import json
 from urllib.parse import urlparse
+import plotly.express as px
 
 st.set_page_config(
     page_title="Boi Preto",
@@ -47,13 +48,9 @@ def get_position_garmin(url):
 
     if response.status_code == 200:
         data = response.json()
-
         track_points = data.get("trackPoints", [])
-
         track_point = track_points[-1]
-        
-        coordinates = track_point["position"]["lat"], track_point["position"]["lon"]
-    return coordinates
+    return track_point["position"]["lat"], track_point["position"]["lon"]
 
 def get_position_wikiloc(url):
     headers = {
@@ -67,10 +64,10 @@ def get_position_wikiloc(url):
         if match:
             data = match.group(1)
             positions = data.split(",")
-            
-            last_latitude = positions[-2]
-            last_longitude = positions[-1]
-            
+
+            last_latitude = positions[-1]
+            last_longitude = positions[-2]
+
             return float(last_longitude), float(last_latitude)
         else:
             st.warning("Dados de posição não encontrados.")
@@ -116,20 +113,9 @@ def live_tracking_page():
             st.warning("Nenhum corredor encontrado no arquivo.")
             return
         
-        fig = go.Figure()
+        test()
         
-        fig.update_layout(
-            mapbox_style="open-street-map",
-            mapbox=dict(zoom=12)
-        )
         
-        fig.add_trace(go.Scattermapbox(
-            mode="lines",
-            lon=official_points[:, 1],
-            lat=official_points[:, 0],
-            marker=dict(size=8, color='green'),
-            name='Rota Oficial'
-        ))
         
         cores = [
             '#FF1493', '#00FFFF', '#FF4500', '#1E90FF', '#32CD32', 
@@ -235,6 +221,33 @@ def compare_sequential_gpx(gpx1_file, gpx2_file, max_distance=2):
     verified_percentage = (np.sum(verified_points) / len(points1)) * 100
     
     return verified_percentage, points1, points2, verified_points
+
+def test():
+    # Dados das coordenadas
+    data = pd.DataFrame({
+        'latitude': [-19.949728, -19.949780, -19.949792],
+        'longitude': [-43.923436, -43.923447, -43.923398],
+        'info': ['Ponto 1', 'Ponto 2', 'Ponto 3']
+    })
+
+    # Criando o mapa
+    fig = px.scatter_mapbox(
+        data,
+        lat='latitude',
+        lon='longitude',
+        hover_name='info',  # Texto do "pop-up" ao passar o mouse
+        zoom=15,
+        height=600
+    )
+
+    # Estilizando o mapa
+    fig.update_layout(
+        mapbox_style="open-street-map",
+        title="Mapa com Pop-ups no Plotly",
+        margin={"r":0,"t":0,"l":0,"b":0}
+    )
+
+    fig.show()
 
 def main():
     # st.sidebar.image("logo.jpg", width=200)
