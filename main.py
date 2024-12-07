@@ -113,9 +113,20 @@ def live_tracking_page():
             st.warning("Nenhum corredor encontrado no arquivo.")
             return
         
-        test()
+        fig = go.Figure()
         
+        fig.update_layout(
+            mapbox_style="open-street-map",
+            mapbox=dict(zoom=12)
+        )
         
+        fig.add_trace(go.Scattermapbox(
+            mode="lines",
+            lon=official_points[:, 1],
+            lat=official_points[:, 0],
+            marker=dict(size=8, color='green'),
+            name='Rota Oficial'
+        ))
         
         cores = [
             '#FF1493', '#00FFFF', '#FF4500', '#1E90FF', '#32CD32', 
@@ -253,7 +264,7 @@ def main():
     # st.sidebar.image("logo.jpg", width=200)
     
     # Add tabs instead of sidebar
-    tab2, tab1 = st.tabs(["Live Tracking", "Verificador GPX"])
+    tab3, tab2, tab1 = st.tabs(["Test", "Live Tracking", "Verificador GPX"])
     
     with tab1:
         st.title('Verificador de Finisher Boi Preto')
@@ -359,6 +370,8 @@ def main():
     
     with tab2:
         live_tracking_page()
+    with tab3:
+        test()
 
 if __name__ == '__main__':
     main()
