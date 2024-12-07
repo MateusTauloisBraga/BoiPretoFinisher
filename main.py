@@ -169,7 +169,7 @@ def live_tracking_page():
                     mode="markers", 
                     lon=[location[1]], 
                     lat=[location[0]], 
-                    marker=dict(size=12, color=cor_atual), 
+                    marker=dict(size=52, color=cor_atual), 
                     name=name, 
                     text="AAAAAAAAAAA",  
                     textposition="top right"  
