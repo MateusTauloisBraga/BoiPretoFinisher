@@ -56,28 +56,35 @@ def get_position_garmin(url):
     return track_point["position"]["lat"], track_point["position"]["lon"]
 
 def get_position_wikiloc(url):
+    # Configurar cabeçalhos para evitar bloqueio
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
     }
 
+    # Fazer a requisição
     response = requests.get(url, headers=headers)
 
+    # Verificar se a página foi acessada com sucesso
     if response.status_code == 200:
+        # print(response.text)
+        # Procurar pela variável "data" no HTML
         match = re.search(r"'data':'(.*?)'", response.text)
         if match:
+            # Capturar os dados e dividir as posições
             data = match.group(1)
             positions = data.split(",")
+            
+            # Pegar a última posição (latitude e longitude)
+            last_latitude = positions[-4]
+            last_longitude = positions[-3]
+            
+            # print(f"Última posição: Latitude: {last_latitude}, Longitude: {last_longitude}")
 
-            last_latitude = positions[-1]
-            last_longitude = positions[-2]
-
-            return float(last_longitude), float(last_latitude)
+            return float(last_longitude),float(last_latitude)
         else:
-            st.warning("Dados de posição não encontrados.")
-            return None
+            print("Dados de posição não encontrados.")
     else:
-        st.error(f"Erro ao acessar a página. Código HTTP: {response.status_code}")
-        return None
+        print(f"Erro ao acessar a página. Código HTTP: {response.status_code}")
 
 def parse_runners_file(file_path):
     runners = {}
@@ -156,7 +163,7 @@ def live_tracking_page():
                     location = get_position_wikiloc(url) 
                 except: 
                     pass 
-            if 'gar' in url: 
+            if 'garmin' in url: 
                 try: 
                     location = get_position_garmin(url) 
                 except: 
