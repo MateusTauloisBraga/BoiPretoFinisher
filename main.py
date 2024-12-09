@@ -93,6 +93,9 @@ def parse_runners_file(file_path):
 
 def live_tracking_page():
     st.title('Live Tracking')
+    st.write("Para melhor experiência de navegação no celular, abrir a página no modo desktop")
+    st.write("Android: (%s)" % "https://browserstack.wpenginepowered.com/wp-content/uploads/2022/01/Screenshot1.png")
+    st.write("IOS: (%s)" % "https://cdn.osxdaily.com/wp-content/uploads/2015/10/request-desktop-site-ios-safari-610x542.jpg")
     
     try:
         with open("BoiPreto.gpx", "r") as gpx_file:
@@ -127,10 +130,10 @@ def live_tracking_page():
             mode="lines",
             lon=official_points[:, 1],
             lat=official_points[:, 0],
-            marker=dict(size=8, color='green'),
+            marker=dict(size=100, color='green'),
             name='Rota Oficial'
         ))
-        
+
         cores = [
             '#FF1493', '#00FFFF', '#FF4500', '#1E90FF', '#32CD32', 
             '#FF69B4', '#00CED1', '#FF6347', '#4169E1', '#3CB371', 
