@@ -9,9 +9,6 @@ import re
 from bs4 import BeautifulSoup
 import json
 from urllib.parse import urlparse
-import plotly.express as px
-import folium
-import folium.plugins
 
 st.set_page_config(
     page_title="Boi Preto",
@@ -50,41 +47,37 @@ def get_position_garmin(url):
 
     if response.status_code == 200:
         data = response.json()
+
         track_points = data.get("trackPoints", [])
+
         track_point = track_points[-1]
+        
+        coordinates = track_point["position"]["lat"], track_point["position"]["lon"]
+    return coordinates
 
-    return track_point["position"]["lat"], track_point["position"]["lon"]
-
-def get_position_wikiloc(url):
-    # Configurar cabeçalhos para evitar bloqueio
+def get_position(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
     }
 
-    # Fazer a requisição
     response = requests.get(url, headers=headers)
 
-    # Verificar se a página foi acessada com sucesso
     if response.status_code == 200:
-        # print(response.text)
-        # Procurar pela variável "data" no HTML
         match = re.search(r"'data':'(.*?)'", response.text)
         if match:
-            # Capturar os dados e dividir as posições
             data = match.group(1)
             positions = data.split(",")
             
-            # Pegar a última posição (latitude e longitude)
             last_latitude = positions[-4]
             last_longitude = positions[-3]
             
-            # print(f"Última posição: Latitude: {last_latitude}, Longitude: {last_longitude}")
-
             return float(last_longitude),float(last_latitude)
         else:
-            print("Dados de posição não encontrados.")
+            st.warning("Dados de posição não encontrados.")
+            return None
     else:
-        print(f"Erro ao acessar a página. Código HTTP: {response.status_code}")
+        st.error(f"Erro ao acessar a página. Código HTTP: {response.status_code}")
+        return None
 
 def parse_runners_file(file_path):
     runners = {}
@@ -127,7 +120,7 @@ def live_tracking_page():
         
         fig.update_layout(
             mapbox_style="open-street-map",
-            mapbox=dict(zoom=12)
+            mapbox=dict(zoom=11)
         )
         
         fig.add_trace(go.Scattermapbox(
@@ -160,7 +153,7 @@ def live_tracking_page():
                     pass 
             if 'wikiloc' in url: 
                 try: 
-                    location = get_position_wikiloc(url) 
+                    location = get_position(url) 
                 except: 
                     pass 
             if 'garmin' in url: 
@@ -178,7 +171,6 @@ def live_tracking_page():
                     lat=[location[0]], 
                     marker=dict(size=12, color=cor_atual), 
                     name=name, 
-                    text="AAAAAAAAAAA",  
                     textposition="top right"  
                 ))
                 
@@ -190,7 +182,7 @@ def live_tracking_page():
                     lat=np.mean(official_points[:, 0]),
                     lon=np.mean(official_points[:, 1])
                 ),
-                zoom=12
+                zoom=11
             ),
             height=1000,
             margin={"r":0,"t":30,"l":0,"b":0}
@@ -243,61 +235,11 @@ def compare_sequential_gpx(gpx1_file, gpx2_file, max_distance=2):
     
     return verified_percentage, points1, points2, verified_points
 
-def test():
-    positions = get_position_garmin("https://livetrack.garmin.com/session/ccebb2ad-5214-882b-9414-97f534484d00/token/11FDF95C2BBC9FA89792A396566D9BB")
-    last_latitude = positions[0]
-    last_longitude = positions[1]
-    
-    map_object = folium.Map(location=positions, zoom_start=17)
-
-    folium.Marker(location=(last_latitude, last_longitude),
-                    popup=f"Latitude: {last_latitude}, Longitude: {last_longitude}",
-                    icon=folium.Icon(color="blue", icon="info-sign"),
-                    ).add_to(map_object)
-
-    html = f"""
-        <div style="position: fixed; 
-                    top: 10px; right: 10px; 
-                    background-color: white; 
-                    padding: 8px 12px; 
-                    border-radius: 8px; 
-                    font-size: 16px; 
-                    font-weight: bold; 
-                    color: black;
-                    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); 
-                    z-index: 9999;">
-            <div style="font-size: 18px; font-weight: bold; color: black; margin-bottom: 5px;">
-                Strava - Beacon
-            </div>
-            <div style="font-size: 18px; font-weight: bold; color: black; margin-bottom: 5px;">
-                -
-            </div>
-            <div style="font-size: 16px; color: black;">
-                -
-            </div>
-        </div>
-    """
-
-    map_object.get_root().html.add_child(folium.Element(html))
-    map_html = map_object._repr_html_()
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Meu Mapa</title>
-    </head>
-    <body>
-        <h1>Bem-vindo ao meu mapa!</h1>
-        <div>{map_html}</div>
-    </body>
-    </html>
-    """
-
 def main():
     # st.sidebar.image("logo.jpg", width=200)
     
     # Add tabs instead of sidebar
-    tab3, tab2, tab1 = st.tabs(["Test", "Live Tracking", "Verificador GPX"])
+    tab2, tab1 = st.tabs(["Live Tracking", "Verificador GPX"])
     
     with tab1:
         st.title('Verificador de Finisher Boi Preto')
@@ -318,7 +260,7 @@ def main():
         if input_method == "Upload de Arquivo":
             gpx2_file = st.file_uploader("Arquivo GPX a Comparar", type=['gpx'])
         else:
-            strava_link = st.text_input("Insira o link da atividade no Strava")
+            strava_link = st.text_input("Insira o link da atividade no Strava",value = "https://www.strava.com/activities/10390942897")
             gpx2_file = None
             if strava_link:
                 gpx2_path = download_gpx_from_strava(strava_link)
@@ -332,7 +274,7 @@ def main():
         )
         
         # Botão de comparação
-        if st.button('Comparar Arquivos'):
+        if st.button('Comparar Atividades'):
             if gpx2_file:
                 try:
                     gpx2_file.seek(0)
@@ -358,7 +300,7 @@ def main():
                                 lat=np.mean(points1[:, 0]),
                                 lon=np.mean(points1[:, 1])
                             ),
-                            zoom=12
+                            zoom=11
                         )
                     )
 
@@ -403,8 +345,6 @@ def main():
     
     with tab2:
         live_tracking_page()
-    with tab3:
-        test()
 
 if __name__ == '__main__':
     main()
