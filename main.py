@@ -246,7 +246,7 @@ def live_tracking_page():
         st.plotly_chart(current_map, use_container_width=True)
     
     # Automatic refresh logic
-    for remaining in range(30, 0, -1):
+    for remaining in range(300, 0, -1):
         countdown_placeholder.info(f"Atualizando em {remaining}")
         time.sleep(1)
     
