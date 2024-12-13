@@ -73,10 +73,12 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     return R * c
 
 def format_time(seconds):
-    # Converter segundos para formato hh:mm
+    # Converter segundos para formato hh:mm:ss
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60
-    return f"{hours:02}:{minutes:02}"
+    remaining_seconds = seconds % 60
+    return f"{hours:02}:{minutes:02}:{remaining_seconds:02}"
+
 
 def get_position(url):
     headers = {
