@@ -208,6 +208,7 @@ def live_tracking_page():
                     pass 
             
             if location != 0: 
+                st.write("Atleta {} está com {:.2f}km e com o tempo {}".format(name, distance, time[0]))
                 cor_atual = cores[contador_cor % len(cores)]
                 
                 fig.add_trace(go.Scattermapbox( 
@@ -215,7 +216,7 @@ def live_tracking_page():
                     lon=[location[1]], 
                     lat=[location[0]], 
                     marker=dict(size=12, color=cor_atual), 
-                    name = name + ', ' + f'{distance:.2f} km, ' + str(time), 
+                    name = name, 
                     textposition="top right"  
                 ))
                 
