@@ -55,7 +55,9 @@ def get_position_garmin(url):
         track_point = track_points[-1]
         
         coordinates = track_point["position"]["lat"], track_point["position"]["lon"]
-    return coordinates
+        distance = data.get("trackPoints", [])[-1]['fitnessPointData']['totalDistanceMeters']
+        time = data.get("trackPoints", [])[-1]['fitnessPointData']['totalDurationSecs']
+    return coordinates,distance/1000,format_time(time)
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     # Fórmula de Haversine para calcular a distância entre dois pontos geográficos
@@ -203,7 +205,7 @@ def live_tracking_page():
                     pass 
             if 'garmin' in url: 
                 try: 
-                    location = get_position_garmin(url) 
+                    location,distance,time = get_position_garmin(url) 
                 except: 
                     pass 
             
