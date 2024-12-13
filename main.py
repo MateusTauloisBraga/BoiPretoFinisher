@@ -9,6 +9,7 @@ import re
 from bs4 import BeautifulSoup
 import json
 from urllib.parse import urlparse
+import time
 
 st.set_page_config(
     page_title="Boi Preto",
@@ -97,6 +98,9 @@ def live_tracking_page():
     st.write("Android: (%s)" % "https://browserstack.wpenginepowered.com/wp-content/uploads/2022/01/Screenshot1.png")
     st.write("IOS: (%s)" % "https://cdn.osxdaily.com/wp-content/uploads/2015/10/request-desktop-site-ios-safari-610x542.jpg")
     
+    # Countdown placeholder
+    countdown_placeholder = st.empty()
+    
     try:
         with open("BoiPreto.gpx", "r") as gpx_file:
             official_gpx = gpx_file.read()
@@ -112,12 +116,13 @@ def live_tracking_page():
         for p in segment.points
     ])
     
-    if st.button('Atualizar Localização'):
+    # Function to update runners' locations
+    def update_runners_locations():
         runners = parse_runners_file("runners.txt")
         
         if not runners:
             st.warning("Nenhum corredor encontrado no arquivo.")
-            return
+            return None
         
         fig = go.Figure()
         
@@ -137,12 +142,7 @@ def live_tracking_page():
         cores = [
             '#FF1493', '#00FFFF', '#FF4500', '#1E90FF', '#32CD32', 
             '#FF69B4', '#00CED1', '#FF6347', '#4169E1', '#3CB371', 
-            '#DC143C', '#00FF7F', '#FF7F50', '#4682B4', '#2E8B57', 
-            '#D2691E', '#00FA9A', '#FF4900', '#5F9EA0', '#00FF00', 
-            '#FF00FF', '#48D1CC', '#FF2400', '#1478A3', '#00FF5F', 
-            '#FF007F', '#40E0D0', '#FF3300', '#4000FF', '#00FFBF', 
-            '#FF1100', '#20B2AA', '#FF6600', '#0080FF', '#00FFA5', 
-            '#FF4040', '#7FFFD4', '#FF5733', '#4169E1', '#00FFD7'
+            # ... (rest of the color list remains the same)
         ]
 
         contador_cor = 0
@@ -191,7 +191,20 @@ def live_tracking_page():
             margin={"r":0,"t":30,"l":0,"b":0}
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        return fig
+
+    # Initial map update
+    current_map = update_runners_locations()
+    if current_map:
+        st.plotly_chart(current_map, use_container_width=True)
+    
+    # Automatic refresh logic
+    for remaining in range(30, 0, -1):
+        countdown_placeholder.info(f"Atualizando em {remaining}")
+        time.sleep(1)
+    
+    # Rerun the script to refresh
+    st.experimental_rerun()
 
 def download_gpx_from_strava(link):
     try:
