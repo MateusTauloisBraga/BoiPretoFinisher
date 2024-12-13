@@ -242,112 +242,112 @@ def main():
     # st.sidebar.image("logo.jpg", width=200)
     
     # Add tabs instead of sidebar
-    tab2, tab1 = st.tabs(["Live Tracking", "Verificador GPX"])
+    # tab2, tab1 = st.columns(2)
     
-    with tab1:
-        st.title('Verificador de Finisher Boi Preto')
+    # with tab1:
+    #     st.title('Verificador de Finisher Boi Preto')
         
-        try:
-            with open("BoiPreto.gpx", "r") as gpx_file:
-                gpx1_file = gpx_file.read()
-        except FileNotFoundError:
-            st.error("O arquivo 'BoiPreto.gpx' não foi encontrado no diretório.")
-            return
+    #     try:
+    #         with open("BoiPreto.gpx", "r") as gpx_file:
+    #             gpx1_file = gpx_file.read()
+    #     except FileNotFoundError:
+    #         st.error("O arquivo 'BoiPreto.gpx' não foi encontrado no diretório.")
+    #         return
         
-        # Escolha entre upload ou link do Strava
-        input_method = st.selectbox(
-            "Como deseja fornecer o arquivo GPX a comparar?",
-            options=["Upload de Arquivo", "Link do Strava"]
-        )
+    #     # Escolha entre upload ou link do Strava
+    #     input_method = st.selectbox(
+    #         "Como deseja fornecer o arquivo GPX a comparar?",
+    #         options=["Upload de Arquivo", "Link do Strava"]
+    #     )
         
-        if input_method == "Upload de Arquivo":
-            gpx2_file = st.file_uploader("Arquivo GPX a Comparar", type=['gpx'])
-        else:
-            strava_link = st.text_input("Insira o link da atividade no Strava",value = "https://www.strava.com/activities/10390942897")
-            gpx2_file = None
-            if strava_link:
-                gpx2_path = download_gpx_from_strava(strava_link)
-                if gpx2_path:
-                    gpx2_file = open(gpx2_path, "r")
+    #     if input_method == "Upload de Arquivo":
+    #         gpx2_file = st.file_uploader("Arquivo GPX a Comparar", type=['gpx'])
+    #     else:
+    #         strava_link = st.text_input("Insira o link da atividade no Strava",value = "https://www.strava.com/activities/10390942897")
+    #         gpx2_file = None
+    #         if strava_link:
+    #             gpx2_path = download_gpx_from_strava(strava_link)
+    #             if gpx2_path:
+    #                 gpx2_file = open(gpx2_path, "r")
         
-        # Parâmetro de distância
-        max_distance = st.slider(
-            'Distância máxima para considerar ponto verificado (metros)', 
-            min_value=1, max_value=10, value=2
-        )
+    #     # Parâmetro de distância
+    #     max_distance = st.slider(
+    #         'Distância máxima para considerar ponto verificado (metros)', 
+    #         min_value=1, max_value=10, value=2
+    #     )
         
-        # Botão de comparação
-        if st.button('Comparar Atividades'):
-            if gpx2_file:
-                try:
-                    gpx2_file.seek(0)
+    #     # Botão de comparação
+    #     if st.button('Comparar Atividades'):
+    #         if gpx2_file:
+    #             try:
+    #                 gpx2_file.seek(0)
                     
-                    verified_percentage, points1, points2, verified_points = compare_sequential_gpx(
-                        gpx1_file, gpx2_file, max_distance
-                    )
+    #                 verified_percentage, points1, points2, verified_points = compare_sequential_gpx(
+    #                     gpx1_file, gpx2_file, max_distance
+    #                 )
                     
-                    df1 = pd.DataFrame(points1, columns=['Latitude', 'Longitude'])
-                    df1['Verificado'] = verified_points
-                    df1['Arquivo'] = 'GPX Oficial'
+    #                 df1 = pd.DataFrame(points1, columns=['Latitude', 'Longitude'])
+    #                 df1['Verificado'] = verified_points
+    #                 df1['Arquivo'] = 'GPX Oficial'
                     
-                    df2 = pd.DataFrame(points2, columns=['Latitude', 'Longitude'])
-                    df2['Verificado'] = False
-                    df2['Arquivo'] = 'GPX Comparado'
+    #                 df2 = pd.DataFrame(points2, columns=['Latitude', 'Longitude'])
+    #                 df2['Verificado'] = False
+    #                 df2['Arquivo'] = 'GPX Comparado'
                     
-                    fig = go.Figure()
+    #                 fig = go.Figure()
 
-                    fig.update_layout(
-                        mapbox_style="open-street-map",
-                        mapbox=dict(
-                            center=dict(
-                                lat=np.mean(points1[:, 0]),
-                                lon=np.mean(points1[:, 1])
-                            ),
-                            zoom=11
-                        )
-                    )
+    #                 fig.update_layout(
+    #                     mapbox_style="open-street-map",
+    #                     mapbox=dict(
+    #                         center=dict(
+    #                             lat=np.mean(points1[:, 0]),
+    #                             lon=np.mean(points1[:, 1])
+    #                         ),
+    #                         zoom=11
+    #                     )
+    #                 )
 
-                    fig.add_trace(go.Scattermapbox(
-                        mode="markers",
-                        lon=df1[df1['Verificado']]['Longitude'],
-                        lat=df1[df1['Verificado']]['Latitude'],
-                        marker=dict(size=8, color='green'),
-                        name='Pontos Verificados'
-                    ))
+    #                 fig.add_trace(go.Scattermapbox(
+    #                     mode="markers",
+    #                     lon=df1[df1['Verificado']]['Longitude'],
+    #                     lat=df1[df1['Verificado']]['Latitude'],
+    #                     marker=dict(size=8, color='green'),
+    #                     name='Pontos Verificados'
+    #                 ))
 
-                    fig.add_trace(go.Scattermapbox(
-                        mode="markers",
-                        lon=df1[~df1['Verificado']]['Longitude'],
-                        lat=df1[~df1['Verificado']]['Latitude'],
-                        marker=dict(size=8, color='red'),
-                        name='Pontos Não Verificados'
-                    ))
+    #                 fig.add_trace(go.Scattermapbox(
+    #                     mode="markers",
+    #                     lon=df1[~df1['Verificado']]['Longitude'],
+    #                     lat=df1[~df1['Verificado']]['Latitude'],
+    #                     marker=dict(size=8, color='red'),
+    #                     name='Pontos Não Verificados'
+    #                 ))
 
-                    fig.add_trace(go.Scattermapbox(
-                        mode="markers",
-                        lon=df2['Longitude'],
-                        lat=df2['Latitude'],
-                        marker=dict(size=8, color='blue'),
-                        name='GPX Comparado'
-                    ))
+    #                 fig.add_trace(go.Scattermapbox(
+    #                     mode="markers",
+    #                     lon=df2['Longitude'],
+    #                     lat=df2['Latitude'],
+    #                     marker=dict(size=8, color='blue'),
+    #                     name='GPX Comparado'
+    #                 ))
 
-                    fig.update_layout(
-                        title='Dispersão de Pontos dos Arquivos GPX',
-                        height=600,
-                        margin={"r":0,"t":30,"l":0,"b":0}
-                    )
+    #                 fig.update_layout(
+    #                     title='Dispersão de Pontos dos Arquivos GPX',
+    #                     height=600,
+    #                     margin={"r":0,"t":30,"l":0,"b":0}
+    #                 )
 
-                    st.metric('Pontos Verificados', f'{verified_percentage:.2f}%')
+    #                 st.metric('Pontos Verificados', f'{verified_percentage:.2f}%')
                     
-                    st.plotly_chart(fig, use_container_width=True)
+    #                 st.plotly_chart(fig, use_container_width=True)
                     
-                except Exception as e:
-                    st.error(f'Erro: {str(e)}')
-            else:
-                st.warning('Forneça o arquivo GPX ou link do Strava para comparação.')
+    #             except Exception as e:
+    #                 st.error(f'Erro: {str(e)}')
+    #         else:
+    #             st.warning('Forneça o arquivo GPX ou link do Strava para comparação.')
     
-    with tab2:
-        live_tracking_page()
+    # with tab2:
+    live_tracking_page()
 
 if __name__ == '__main__':
     main()

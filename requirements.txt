@@ -1,11 +1,8 @@
-streamlit
+streamlit==1.6
 gpxpy
 numpy
 plotly
 pandas
 requests
-beautifulsoup4
-lxml
-jsonlib-python3
-urllib3
-folium
+altair==4.2.0
+protobuf==3.20.0
