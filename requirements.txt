@@ -1,4 +1,4 @@
-streamlit ==1.6
+streamlit
 gpxpy
 numpy
 plotly
