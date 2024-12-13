@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 import json
 from urllib.parse import urlparse
 import time
+from math import radians, sin, cos, sqrt, atan2
 
 st.set_page_config(
     page_title="Boi Preto",
@@ -56,6 +57,25 @@ def get_position_garmin(url):
         coordinates = track_point["position"]["lat"], track_point["position"]["lon"]
     return coordinates
 
+def calculate_distance(lat1, lon1, lat2, lon2):
+    # Fórmula de Haversine para calcular a distância entre dois pontos geográficos
+    R = 6371e3  # Raio da Terra em metros
+    
+    phi1, phi2 = radians(lat1), radians(lat2)
+    delta_phi = radians(lat2 - lat1)
+    delta_lambda = radians(lon2 - lon1)
+
+    a = sin(delta_phi / 2) ** 2 + cos(phi1) * cos(phi2) * sin(delta_lambda / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return R * c
+
+def format_time(seconds):
+    # Converter segundos para formato hh:mm
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    return f"{hours:02}:{minutes:02}"
+
 def get_position(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
@@ -68,11 +88,29 @@ def get_position(url):
         if match:
             data = match.group(1)
             positions = data.split(",")
-            
-            last_latitude = positions[-4]
-            last_longitude = positions[-3]
-            
-            return float(last_longitude),float(last_latitude)
+
+            # Separar os dados em blocos de 4 (longitude, latitude, elevação, timestamp)
+            points = [positions[i:i+4] for i in range(0, len(positions), 4)]
+
+            total_distance = 0
+            total_time = 0
+
+            for i in range(1, len(points)):
+                lon1, lat1 = map(float, points[i-1][:2])
+                lon2, lat2 = map(float, points[i][:2])
+                timestamp1, timestamp2 = int(points[i-1][3]), int(points[i][3])
+
+                # Calcular distância e acumular
+                total_distance += calculate_distance(lat1, lon1, lat2, lon2)
+
+                # Calcular tempo total (diferença entre último e primeiro timestamp)
+                if i == len(points) - 1:
+                    total_time = timestamp2 - int(points[0][3])
+
+            last_latitude = float(points[-1][1])
+            last_longitude = float(points[-1][0])
+
+            return last_latitude, last_longitude, total_distance/1000, format_time(total_time)
         else:
             st.warning("Dados de posição não encontrados.")
             return None
@@ -157,6 +195,10 @@ def live_tracking_page():
             if 'wikiloc' in url: 
                 try: 
                     location = get_position(url) 
+                    distance = location[2]
+                    time = [location[3]]
+                    location = location[0:2]
+                    # print(location[0:2])
                 except: 
                     pass 
             if 'garmin' in url: 
@@ -173,7 +215,7 @@ def live_tracking_page():
                     lon=[location[1]], 
                     lat=[location[0]], 
                     marker=dict(size=12, color=cor_atual), 
-                    name=name, 
+                    name = name + ', ' + f'{distance:.2f} km, ' + str(time), 
                     textposition="top right"  
                 ))
                 
