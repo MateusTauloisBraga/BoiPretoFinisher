@@ -6,3 +6,4 @@ pandas
 requests
 altair==4.2.0
 protobuf==3.20.0
+click==8.0.4
