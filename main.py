@@ -253,7 +253,7 @@ def live_tracking_page():
         time.sleep(1)
     
     # Rerun the script to refresh
-    st.experimental_rerun()
+    st.rerun()
 
 def download_gpx_from_strava(link):
     try:
